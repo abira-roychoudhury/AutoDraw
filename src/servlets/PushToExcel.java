@@ -10,11 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 
 
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
  
+
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -23,6 +25,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
@@ -60,22 +63,20 @@ public class PushToExcel extends HttpServlet {
         
         try {
             FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
-            Workbook workbook = new XSSFWorkbook(inputStream);
- 
-            Sheet sheet = workbook.getSheetAt(0);
+            XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
+	        XSSFSheet sheet = workbook.getSheetAt(0);
             
             Cell cellPartNo= sheet.getRow(2).getCell(0);
             String partNo = cellPartNo.getStringCellValue();
             System.out.println("partno text "+partNo);
             cellPartNo.setCellValue(partNo+" "+partno);
             
-           /* Cell cellPartName= sheet.getRow(1).getCell(2);
+            Cell cellPartName= sheet.getRow(3).getCell(0);
             String partName = cellPartName.getStringCellValue();
             cellPartName.setCellValue(partName+" "+partname);
             
-            Cell cellProcessName= sheet.getRow(2).getCell(9);
-            String processName = cellProcessName.getStringCellValue();
-            cellProcessName.setCellValue(processName+" "+processname);    */
+            Cell cellProcessName= sheet.getRow(4).createCell(1);
+            cellProcessName.setCellValue(processname);    
             
             inputStream.close();
             

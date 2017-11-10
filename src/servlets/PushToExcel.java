@@ -59,23 +59,27 @@ public class PushToExcel extends HttpServlet {
 		String partname = request.getParameter("partname");
 		String processname = request.getParameter("processname");
 				
-		String excelFilePath = "C:/eclipse-jee-luna-R-win32-x86_64/eclipse/Demo.xlsx";
+		//String excelFilePath = "C:/eclipse-jee-luna-R-win32-x86_64/eclipse/ControlPlanDemo.xlsx";
+		String excelFilePath = "C:/eclipse-jee-luna-R-win32-x86_64/eclipse/ControlDemo.xlsx";
         
         try {
             FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
 	        XSSFSheet sheet = workbook.getSheetAt(0);
             
+	        //Cell cellPartNo= sheet.getRow(2).getCell(0);
             Cell cellPartNo= sheet.getRow(2).getCell(0);
             String partNo = cellPartNo.getStringCellValue();
             System.out.println("partno text "+partNo);
             cellPartNo.setCellValue(partNo+" "+partno);
             
-            Cell cellPartName= sheet.getRow(3).getCell(0);
+            //Cell cellPartName= sheet.getRow(3).getCell(0);
+           Cell cellPartName= sheet.getRow(3).getCell(0);
             String partName = cellPartName.getStringCellValue();
             cellPartName.setCellValue(partName+" "+partname);
             
-            Cell cellProcessName= sheet.getRow(4).createCell(1);
+           // Cell cellProcessName= sheet.getRow(9).createCell(1);
+            Cell cellProcessName= sheet.createRow(9).createCell(1);
             cellProcessName.setCellValue(processname);    
             
             inputStream.close();
@@ -89,7 +93,7 @@ public class PushToExcel extends HttpServlet {
             ex.printStackTrace();
         }		
 		
-		response.getWriter().print("received  "+partno+"   "+partname+"   "+processname);
+		response.getWriter().print("Appended Data to Excel");
 		
 	}
 

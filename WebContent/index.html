@@ -9,16 +9,52 @@
 
 <body>
 <div class="container">
-<h2> OCR Demo</h2>
-    <div class="col-xs-4">
-    	<div class="form-group">
-    	<form method="post" action="Processing" enctype="multipart/form-data">
-	      <label class="control-label">Upload Image</label>
-	      <input type="file" name ="file" class="filestyle" data-buttonText="Select a File"></br>
-	      <input type="submit" class="btn btn-primary" value="Process">
-	     </form>   
+<div class="row logo">
+	<img class="col-lg-3 col-md-3" src="images/logo.png">
+</div>
+<center>
+	<div class="col-sm-6 col-sm-offset-3 content">
+		<div class="panel panel-default">
+			<div class="panel-heading" style="border: 1px solid gray; background: #eae9e9;">
+			 	<h2 class="heading"> Control Plan Generation </h2>
+			</div>
+			<div class="panel-body" style="border: 1px solid gray">
+				<div class="form-group">
+		    		<form method="post" action="Processing" enctype="multipart/form-data">
+			      		<label class="control-label"><h4>Upload Engineering Drawing for Processing </h4></label>
+			      		<input type="file" name ="file" class="filestyle" data-buttonText="Select a File" class="fileupload" style="margin-top:20px; border: 1px gray solid; width : 300px ; height : 24px;"></br>
+			      		<input type="submit" class="btn uploadButton" value="Process">
+			     	</form>   
+				</div>  	
+			</div>
 		</div>
-    </div>
+	</div>
+</center>
 </div>
 </body>
+
+<style>
+.logo{
+	margin-top : 20px;
+
+}
+
+.content
+{
+ 	margin-top : 70px;
+}
+ 
+.heading{
+color:#B4054C;
+}
+
+.uploadButton
+{
+background-color:#B4054C;
+color:#fff;
+border-radius : 0px;
+}
+
+</style>
+
 </html>

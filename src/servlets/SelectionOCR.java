@@ -60,15 +60,20 @@ public class SelectionOCR extends HttpServlet {
 			JSONObject textAnnotaionsDict=responsesArray.getJSONObject(0);
 			textAnnotationArray=(JSONArray)textAnnotaionsDict.getJSONArray(Constants.VisionResponse.textAnnotations);			
 			
-		} catch (Exception e) {		
-			e.printStackTrace();
-			return "Could not scan any value. Please try some different selection";
-		}
-		try {			  			
 			JSONObject firstObj=(JSONObject) textAnnotationArray.get(0);
 			String descriptionStr=firstObj.getString(Constants.VisionResponse.description);
-			descriptionStr = descriptionStr.replaceAll("[^\\x00-\\x7F]+", "");			
-			return descriptionStr;
+			descriptionStr = descriptionStr.replaceAll("[^\\x00-\\x7F]+", "");
+			String templatedDescription = "";
+			
+			System.out.println("descriptionStr : "+descriptionStr);
+			if(descriptionStr.contains("\n")){
+				String splitDesc[] = descriptionStr.split("\\n");
+				templatedDescription =splitDesc[0] +" - "+splitDesc[1];
+			} 
+			else
+				templatedDescription = descriptionStr.substring(0,4) +" - "+ descriptionStr.substring(descriptionStr.length() - 5);
+			
+			return templatedDescription;
 		}catch (JSONException e) {
 			e.printStackTrace();
 			return "Could not scan any value. Please try some different selection";

@@ -14,7 +14,8 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/imgareaselect-default.css" />
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+	<script src="js/jquery-3.2.1.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/jquery.imgareaselect.pack.js"></script>
 	<script type="text/javascript">
@@ -22,10 +23,14 @@
 		var compressedDim = {"height" : <%=request.getAttribute("compressHeight")%>,
 							 "width" : <%=request.getAttribute("compressWidth")%>} 
 		var fileType = '<%=request.getAttribute("fileType")%>'
+		var numberOfBubbles = <%=request.getAttribute("numberOfBubbles")%>
+		var coordinatesOfBubbles = <%=request.getAttribute("coordinatesOfBubbles")%>
 	</script>
 	
   
 <body>
+
+	<% LinkedHashMap<String,String> displayDocument = (LinkedHashMap<String,String>)request.getAttribute("displayDocument"); %>
 
 	<div id="submitLoader" class="loader"></div>
 	
@@ -74,31 +79,100 @@
 				</div>
 				<div class="panel-body">
 				
-					<div class = "form-group form-horizontal">
-						<label class="control-label col-sm-2" for = "partno">Part No </label>  
-						<div class="col-sm-10">
-							<input class="form-control" type = "text" id="partno">
-						</div>	
-					</div>		
+				
+					<div id="block1">
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "partno">Part No </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="partno" value ="${displayDocument['Part No']}">
+							</div>	
+						</div>		
+						
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "partname">Part Name </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="partname" value ="${displayDocument['Part Name']}">
+							</div>	
+						</div>			
+						
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "processname">Process Name </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="processname" value ="${displayDocument['Process Name']}">
+							</div>	
+						</div>
+						
+						<button class="btn btn-primary" id="next1">Next</button>
+					</div>
 					
-					<div class = "form-group form-horizontal">
-						<label class="control-label col-sm-2" for = "partname">Part Name </label>  
-						<div class="col-sm-10">
-							<input class="form-control" type = "text" id="partname">
+					
+					<div id="block2" style="display : none">
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "usl"> Weight USL </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="usl" value ="${displayDocument['USL']}">
+							</div>	
 						</div>	
+						
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "mid"> Weight MID </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="mid" value ="${displayDocument['MID']}">
+							</div>	
+						</div>	
+						
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "lsl"> Weight LSL </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="lsl" value ="${displayDocument['LSL']}">
+							</div>	
+						</div>					
+						
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "density">Density </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="density" value ="${displayDocument['density']}">
+							</div>	
+						</div>	
+												
+						<button class="btn btn-primary" id="next2">Next</button>
+					</div>
+
+			
+					<div id="block3" style="display : none">
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-3" for = "burr">Compaction control burr </label>  
+							<div class="col-sm-9">
+								<input class="form-control" type = "text" id="burr" value ="${displayDocument['burr']}">
+							</div>	
+						</div>
+						
+						<button class="btn btn-primary" id="next3">Next</button>
 					</div>			
 					
-					<div class = "form-group form-horizontal">
-						<label class="control-label col-sm-2" for = "processname">Process Name </label>  
-						<div class="col-sm-10">
-							<input class="form-control" type = "text" id="processname">
+					
+					<div id="block4" style="display : none">
+						<h4> Number of Bubbles found : <%=request.getAttribute("numberOfBubbles")%> </h4>
+						<button class="btn btn-primary" id="next4">Proceed</button>			
+					</div>	
+					
+					<div id="block5" style="display : none">
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2">Value</label>  
+							<div class="col-sm-10">
+								<input class="form-control" type="text" id="bubbleValue" value ="">
+							</div>	
 						</div>	
-					</div>
-										
+						<button class="btn btn-primary" id="save">Save</button>
+						<button class="btn btn-primary" id="skip">Skip</button>	
+						<label id="bubbleLabel"></label>				
+					</div>			
+					
+							
 				</div>
 				
 				<div class="panel-footer">
-					<button type="button" id="excel" class="btn btn-primary">Excel</button>
+					<button type="button" id="excel" class="btn btn-primary">Save to Excel</button>
 					<label id = "excelLabel"></label>
 				</div>
 				

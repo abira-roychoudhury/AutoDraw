@@ -27,7 +27,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import apiClass.DocumentTemplating;
+import apiClass.GetRequestTest;
 import apiClass.ImageEnhancement;
+import apiClass.TemplateMatching;
 import apiClass.TimestampLogging;
 import apiClass.VisionAPICall;
 
@@ -90,6 +92,21 @@ public class Processing extends HttpServlet {
 		} 
 		System.out.println("imgFile "+imgFile);
 		
+		
+		/*//Calling Python API
+		JSONObject bubbleData = GetRequestTest.pythonApiCall(imgFile.getAbsolutePath());
+		int numberOfBubbles = bubbleData.getInt("numberOfBubbles");
+		System.out.println("numberOfBubbles : "+numberOfBubbles);
+		request.setAttribute("numberOfBubbles", numberOfBubbles);		
+		request.setAttribute("coordinatesOfBubbles",bubbleData.get("coordinatesOfBubbles"));*/
+		
+		//Get Location of bubble using template matching
+		JSONObject bubbleData = TemplateMatching.getBubbleLocation(imgFile.getAbsolutePath());
+		int numberOfBubbles = bubbleData.getInt("numberOfBubbles");
+		System.out.println("numberOfBubbles : "+numberOfBubbles);
+		request.setAttribute("numberOfBubbles", numberOfBubbles);		
+		request.setAttribute("coordinatesOfBubbles",bubbleData.get("coordinatesOfBubbles"));
+		
 		//uploading image completed logging upload image
 		timelogging.fileDesc(fileName, fileType);
 		int timeDifference = timelogging.fileLog(Constants.uploadImage, start, end);
@@ -121,10 +138,41 @@ public class Processing extends HttpServlet {
 		//Closing ImageFile
 		fileInputStreamReader.close();	
 		
+		String textDetectionType = Constants.VisionRequest.documentTextDetection;
+		JSONObject visionResponse = new VisionAPICall().performOCR(imgBase64, textDetectionType);
+		String descriptionStr = getDescription(visionResponse);
+		LinkedHashMap<String, String> displayDocument = new DocumentTemplating().parseContent(descriptionStr);
+		request.setAttribute("displayDocument", displayDocument);
+		
 
 		//dispatching request to jsp page
 		RequestDispatcher dispatcher = request.getServletContext().getRequestDispatcher("/ViewImage.jsp");
 		dispatcher.forward(request, response);		
+	}
+	
+	private String getDescription(JSONObject visionResponse) {
+		JSONArray textAnnotationArray = new JSONArray();
+		try {
+			JSONObject body = new JSONObject(visionResponse.get(Constants.VisionResponse.body));
+			String bodystring=visionResponse.getString(Constants.VisionResponse.body);
+			JSONObject bodyObject=new JSONObject(bodystring);
+			JSONArray responsesArray=(JSONArray) bodyObject.getJSONArray(Constants.VisionResponse.responses);
+			JSONObject textAnnotaionsDict=responsesArray.getJSONObject(0);
+			textAnnotationArray=(JSONArray)textAnnotaionsDict.getJSONArray(Constants.VisionResponse.textAnnotations);			
+			
+		} catch (Exception e) {		
+			e.printStackTrace();
+			return "Could not scan any value. Please try some different selection";
+		}
+		try {			  			
+			JSONObject firstObj=(JSONObject) textAnnotationArray.get(0);
+			String descriptionStr=firstObj.getString(Constants.VisionResponse.description);
+			descriptionStr = descriptionStr.replaceAll("[^\\x00-\\x7F]+", "");			
+			return descriptionStr;
+		}catch (JSONException e) {
+			e.printStackTrace();
+			return "Could not scan any value. Please try some different selection";
+		}
 	}
 	
 

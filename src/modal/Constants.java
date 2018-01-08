@@ -6,8 +6,10 @@ public class Constants {
 	
 	//Inside servlet Processing2
 	public static final String imgFile = "image";
+	public static final String pdfFile = "pdf";
 	public static final String logFile = "Log_File.txt";
 	public static final String jpg = "jpg";
+	public static final String pdf = "pdf";
 	public static final String compress = "compress";
 	public static final String jsonFileOfStateCity = "list_of_cities_and_state.json";
 	

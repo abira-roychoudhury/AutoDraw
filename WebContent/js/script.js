@@ -281,21 +281,27 @@ function focusOnBubble(index){
 	        	
 	var canvas = document.createElement('canvas');
 	var canvasContext = canvas.getContext('2d'); 
-	
+	var visionCanvas = document.createElement('canvas');
+	var visionCanavasContext = visionCanvas.getContext('2d');
 	
 	var newHeight = height/aspectRatio;
 	var newWidth = width/aspectRatio;
 	
 	canvas.height = newHeight;
 	canvas.width = newWidth;
+	visionCanvas.height = height+25/aspectRatio;
+	visionCanvas.width = width+150/aspectRatio;
 	
-	var image = document.getElementById("image");
+	var image = document.getElementById("image"); 
 	canvasContext.drawImage(image,ox1/aspectRatio,oy1/aspectRatio,newWidth,newHeight,0,0,newWidth,newHeight);
+	visionCanavasContext.drawImage(image,ox1/aspectRatio,oy1/aspectRatio,visionCanvas.width,visionCanvas.height,0,0,visionCanvas.width,visionCanvas.height);
 	
 	
 	var croppedImage = document.getElementById("croppedImage");
 	croppedImage.src = canvas.toDataURL();
-	croppedImageBase64 = croppedImage.src;	
+	croppedImageBase64 = visionCanvas.toDataURL();	
+	console.log("inside looping ##############################################");
+	console.log(croppedImageBase64);
 	
 	$("#submit").trigger("click")
 }

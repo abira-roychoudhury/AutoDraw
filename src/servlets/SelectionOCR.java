@@ -1,6 +1,8 @@
 package servlets;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -65,19 +67,49 @@ public class SelectionOCR extends HttpServlet {
 			descriptionStr = descriptionStr.replaceAll("[^\\x00-\\x7F]+", "");
 			String templatedDescription = "";
 			
-			System.out.println("descriptionStr : "+descriptionStr);
-			if(descriptionStr.contains("\n")){
-				String splitDesc[] = descriptionStr.split("\\n");
-				templatedDescription =splitDesc[0] +" - "+splitDesc[1];
-			} 
-			else
-				templatedDescription = descriptionStr.substring(0,4) +" - "+ descriptionStr.substring(descriptionStr.length() - 5);
 			
+			            //Old method for templating
+						/*System.out.println("descriptionStr : "+descriptionStr);
+						if(descriptionStr.contains("\n")){
+							String splitDesc[] = descriptionStr.split("\\n");
+							templatedDescription =splitDesc[0] +" - "+splitDesc[1];
+						} 
+						else
+							templatedDescription = descriptionStr.substring(0,4) +" - "+ descriptionStr.substring(descriptionStr.length() - 5);
+			*/
+			int number=0;
+			String splitDesc[] = descriptionStr.split("\\n");
+			for(int index=0;index<splitDesc.length;index++){
+				String value = getDecimalValue(splitDesc[index]);
+				if(!value.isEmpty()){
+					if(number==0)
+						templatedDescription = value + " - ";
+					else
+						templatedDescription = templatedDescription + value;
+					number++;					
+				}
+			}
+			
+						
 			return templatedDescription;
 		}catch (JSONException e) {
 			e.printStackTrace();
 			return "Could not scan any value. Please try some different selection";
 		}
+	}
+
+	private String getDecimalValue(String content) {
+		String decimalValue = "";
+		Pattern pattern = Pattern.compile("[0-9]{1}.[0-9]{2}");
+		Matcher matcher = pattern.matcher(content);
+		if (matcher.find())
+		{
+			try{
+				decimalValue = matcher.group(0);
+			}catch(Exception e){}
+		}
+		
+		return decimalValue;
 	}
 
 }

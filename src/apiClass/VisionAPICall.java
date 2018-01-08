@@ -20,7 +20,6 @@ public class VisionAPICall {
 	 * OUTPUT : JSONObject of the response from Vision API
 	 * */
 	public JSONObject performOCR(String base64String, String type){
-		
 		String apiUrl = Constants.VisionRequest.visionApiUrl;
 		String apiKey = Constants.VisionRequest.visionApiKey;
 		JSONObject result = new JSONObject();

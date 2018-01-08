@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import apiClass.DocumentTemplating;
 import apiClass.GetRequestTest;
 import apiClass.ImageEnhancement;
+import apiClass.PdfToImage;
 import apiClass.TemplateMatching;
 import apiClass.TimestampLogging;
 import apiClass.VisionAPICall;
@@ -64,6 +65,9 @@ public class Processing extends HttpServlet {
 		String fileName = "",fileType = "Drawing",filePath="";
 		String imgName = Constants.imgFile+start.getTime()+Constants.dot+Constants.jpg;
 		File imgFile = new File(imgName);
+		String pdfName = Constants.imgFile+start.getTime()+Constants.dot+Constants.pdf;
+		File pdfFile = new File(pdfName);
+		
 		
 		//uploading the image file
 		DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -78,8 +82,9 @@ public class Processing extends HttpServlet {
 				{
 					fileName = fileItem.getName();					 
 					start = new Date();
-					fileItem.write(imgFile);      //writing a temporary file
+					fileItem.write(pdfFile);      //writing a temporary pdf file
 					fileItem.delete();
+					PdfToImage.convert(pdfFile, imgFile);
 					filePath = imgFile.getAbsolutePath();
 					end = new Date();			          
 				}
@@ -93,24 +98,11 @@ public class Processing extends HttpServlet {
 		System.out.println("imgFile "+imgFile);
 		
 		
-		/*//Calling Python API
-		JSONObject bubbleData = GetRequestTest.pythonApiCall(imgFile.getAbsolutePath());
-		int numberOfBubbles = bubbleData.getInt("numberOfBubbles");
-		System.out.println("numberOfBubbles : "+numberOfBubbles);
-		request.setAttribute("numberOfBubbles", numberOfBubbles);		
-		request.setAttribute("coordinatesOfBubbles",bubbleData.get("coordinatesOfBubbles"));*/
-		
-		//Get Location of bubble using template matching
-		JSONObject bubbleData = TemplateMatching.getBubbleLocation(imgFile.getAbsolutePath());
-		int numberOfBubbles = bubbleData.getInt("numberOfBubbles");
-		System.out.println("numberOfBubbles : "+numberOfBubbles);
-		request.setAttribute("numberOfBubbles", numberOfBubbles);		
-		request.setAttribute("coordinatesOfBubbles",bubbleData.get("coordinatesOfBubbles"));
-		
 		//uploading image completed logging upload image
 		timelogging.fileDesc(fileName, fileType);
 		int timeDifference = timelogging.fileLog(Constants.uploadImage, start, end);
 		request.setAttribute(Constants.uploadImage, timeDifference);
+		
 		
 		//Calling ImageEnhancement and getting back a preprocessed base64 image string
 		start = new Date();		          
@@ -119,6 +111,14 @@ public class Processing extends HttpServlet {
 		end = new Date();
 		timeDifference = timelogging.fileLog(Constants.base64conversion, start, end);
 		request.setAttribute(Constants.base64conversion, timeDifference);
+		
+		//Get Location of bubble using template matching
+		JSONObject bubbleData = TemplateMatching.getBubbleLocation(filePath);
+		int numberOfBubbles = bubbleData.getInt("numberOfBubbles");
+		System.out.println("numberOfBubbles : "+numberOfBubbles);
+		request.setAttribute("numberOfBubbles", numberOfBubbles);		
+		request.setAttribute("coordinatesOfBubbles",bubbleData.get("coordinatesOfBubbles"));
+
 		
 		//compressed image property 
 		byte[] decoded = Base64.decodeBase64(processedImgBase64.getBytes());

@@ -14,19 +14,19 @@ public class DocumentTemplating {
 		int partno=0, processname=0,burr=0,usl=0,mid=0,lsl=0,partname=0;
 		String key="",value="",density1="",density2="";
 		int colon,space;
-		
+		System.out.println("*******************************************************");
 		for(int i=0; i<splitDesc.length;i++)
 		{
+			System.out.println(splitDesc[i]);
 			//partno extraction
 			if(splitDesc[i].contains("porite") && partno==0){
-				displayDocument.put("Part No", "I"+splitDesc[i].substring(8));
+				displayDocument.put("Part No", splitDesc[i].substring(7));
 				partno++;
 			}
 			
 			//process name extraction
 			else if(splitDesc[i].contains("Process") && processname==0){
-				i+=2;
-				displayDocument.put("Process Name", splitDesc[i]);
+				displayDocument.put("Process Name", splitDesc[i+3]);
 				processname++;				
 			}
 			
@@ -43,9 +43,7 @@ public class DocumentTemplating {
 				colon = splitDesc[i].indexOf(":");
 				value = splitDesc[i].substring(colon+2,colon+6);
 				displayDocument.put("USL", value);
-				space = splitDesc[i].lastIndexOf(" ");
-				value = splitDesc[i].substring(space+1);
-				density1 = value;
+				density1 = splitDesc[i+1];
 				usl++;
 			}
 			
@@ -62,17 +60,14 @@ public class DocumentTemplating {
 				colon = splitDesc[i].indexOf(":");
 				value = splitDesc[i].substring(colon+2,colon+6);
 				displayDocument.put("LSL", value);
-				space = splitDesc[i].lastIndexOf(" ");
-				value = splitDesc[i].substring(space+1);
-				density2 = value;
+				density2 = splitDesc[i+1];;
 				displayDocument.put("density", density1+"~"+density2);
 				lsl++;
 			}
 			
 			//Part name extraction
 			else if(splitDesc[i].contains("PART") && splitDesc[i].contains("NAME") && partname==0){
-				i++;
-				displayDocument.put("Part Name", splitDesc[i]);
+				displayDocument.put("Part Name", splitDesc[i+1]);
 				partname++;
 			}
 				

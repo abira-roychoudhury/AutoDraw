@@ -22,11 +22,14 @@ public class TemplateMatching {
 	    return imgMat;
 	}
 	
+	
 	public Mat loadOriginalImage(final String filePath) {		
 		//LOAD IMAGE IN color
 	    Mat imgMat = Imgcodecs.imread(filePath, Imgcodecs.CV_LOAD_IMAGE_COLOR);
 	    return imgMat;
 	}
+	
+	
 	 public JSONObject run(String inFile, String templateFile, String outFile, int match_method) {
 	        System.out.println("\nRunning Template Matching");
 	        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -71,10 +74,10 @@ public class TemplateMatching {
 		        	
 		        	
 		        	JSONObject point = new JSONObject();
-		        	point.put("x1", (matchLoc.x - 75));
-		        	point.put("y1", (matchLoc.y - 25));
-		        	point.put("x2", (matchLoc.x + templ.cols() + 75));
-		        	point.put("y2", (matchLoc.y + templ.rows() + 25));
+		        	point.put("x1", (matchLoc.x - 300));
+		        	point.put("y1", (matchLoc.y - 50));
+		        	point.put("x2", (matchLoc.x + templ.cols() + 300));
+		        	point.put("y2", (matchLoc.y + templ.rows() + 50));
 		        	
 		        	coordinatesOfBubbles.put(point);	
 		        	count++;
@@ -90,23 +93,22 @@ public class TemplateMatching {
 		        	break;
 		    }
 	        // Save the visualized detection.
-	        System.out.println("Writing " + outFile);
+	       // System.out.println("Writing " + outFile);
 	        Imgcodecs.imwrite(outFile, img);
 	        
 	        bubbleData.put("numberOfBubbles", count);
 	        bubbleData.put("coordinatesOfBubbles", coordinatesOfBubbles);
 	        
 	        return bubbleData;
-			
-
-	    }
+	   }
 	
+	 
 	public static JSONObject getBubbleLocation(String inFile) {
 		
 		TemplateMatching tool = new TemplateMatching();
 	
 		//String inFile = "D:/autocad draw/code/bubbleFinding/Production Drawing_Example_pdf-001.jpg";
-		String templateFile = "D:/autocad draw/code/bubbleFinding/bubble.png";
+		String templateFile = "D:/autocad draw/code/bubbleFinding/bubble2.png";
 		String outFile = "D:/autocad draw/code/bubbleFinding/output.png";
 		int match_method = Imgproc.TM_CCOEFF_NORMED;
 		

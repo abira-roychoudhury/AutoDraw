@@ -45,8 +45,8 @@ public class SelectionOCR extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String base64 = request.getParameter("croppedImageBase64");
-		System.out.println(base64.substring(22));
-		String textDetectionType = Constants.VisionRequest.documentTextDetection;
+		//System.out.println(base64.substring(22));
+		String textDetectionType = Constants.VisionRequest.textDetection;
 		JSONObject visionResponse = new VisionAPICall().performOCR(base64.substring(22), textDetectionType);		
 		String description = getDescription(visionResponse);		
 		response.getWriter().print(description);
@@ -65,19 +65,11 @@ public class SelectionOCR extends HttpServlet {
 			JSONObject firstObj=(JSONObject) textAnnotationArray.get(0);
 			String descriptionStr=firstObj.getString(Constants.VisionResponse.description);
 			descriptionStr = descriptionStr.replaceAll("[^\\x00-\\x7F]+", "");
-			String templatedDescription = "";
+			String templatedDescription = descriptionStr;
 			
+			System.out.println("descriptionStr: "+descriptionStr);
 			
-			            //Old method for templating
-						/*System.out.println("descriptionStr : "+descriptionStr);
-						if(descriptionStr.contains("\n")){
-							String splitDesc[] = descriptionStr.split("\\n");
-							templatedDescription =splitDesc[0] +" - "+splitDesc[1];
-						} 
-						else
-							templatedDescription = descriptionStr.substring(0,4) +" - "+ descriptionStr.substring(descriptionStr.length() - 5);
-			*/
-			int number=0;
+			/*int number=0;
 			String splitDesc[] = descriptionStr.split("\\n");
 			for(int index=0;index<splitDesc.length;index++){
 				String value = getDecimalValue(splitDesc[index]);
@@ -88,7 +80,7 @@ public class SelectionOCR extends HttpServlet {
 						templatedDescription = templatedDescription + value;
 					number++;					
 				}
-			}
+			}*/
 			
 						
 			return templatedDescription;
@@ -96,20 +88,6 @@ public class SelectionOCR extends HttpServlet {
 			e.printStackTrace();
 			return "Could not scan any value. Please try some different selection";
 		}
-	}
-
-	private String getDecimalValue(String content) {
-		String decimalValue = "";
-		Pattern pattern = Pattern.compile("[0-9]{1}.[0-9]{2}");
-		Matcher matcher = pattern.matcher(content);
-		if (matcher.find())
-		{
-			try{
-				decimalValue = matcher.group(0);
-			}catch(Exception e){}
-		}
-		
-		return decimalValue;
 	}
 
 }

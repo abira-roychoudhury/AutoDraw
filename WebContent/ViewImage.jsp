@@ -25,6 +25,7 @@
 		var fileType = '<%=request.getAttribute("fileType")%>'
 		var numberOfBubbles = <%=request.getAttribute("numberOfBubbles")%>
 		var coordinatesOfBubbles = <%=request.getAttribute("coordinatesOfBubbles")%>
+		var coordinatesOfValues = <%=request.getAttribute("coordinatesOfValues")%>
 	</script>
 	
   
@@ -45,7 +46,7 @@
 		
 				<div class="panel-body">
 					
-					<img id="image" alt=""  class="col-sm-12 col-md-12 col-xs-12"  src="" style="margin-bottom:10px" >
+					<img id="image" alt=""  class="col-sm-12 col-md-12 col-xs-12"  src="" style="margin-bottom:10px; padding : 0px" >
 					
 				</div>	
 			</div>
@@ -89,6 +90,13 @@
 						</div>		
 						
 						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "date">Release Date </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="date" value ="${displayDocument['Release Date']}">
+							</div>	
+						</div>		
+						
+						<div class = "form-group form-horizontal">
 							<label class="control-label col-sm-2" for = "partname">Part Name </label>  
 							<div class="col-sm-10">
 								<input class="form-control" type = "text" id="partname" value ="${displayDocument['Part Name']}">
@@ -102,61 +110,29 @@
 							</div>	
 						</div>
 						
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2" for = "customerpartno">Customer Part No </label>  
+							<div class="col-sm-10">
+								<input class="form-control" type = "text" id="customerpartno" value ="${displayDocument['Customer Part No']}">
+							</div>	
+						</div>
+						
 						<button class="btn btn-primary" id="next1">Next</button>
 					</div>
 					
 					
 					<div id="block2" style="display : none">
-						<div class = "form-group form-horizontal">
-							<label class="control-label col-sm-2" for = "usl"> Weight USL </label>  
-							<div class="col-sm-10">
-								<input class="form-control" type = "text" id="usl" value ="${displayDocument['USL']}">
-							</div>	
-						</div>	
-						
-						<div class = "form-group form-horizontal">
-							<label class="control-label col-sm-2" for = "mid"> Weight MID </label>  
-							<div class="col-sm-10">
-								<input class="form-control" type = "text" id="mid" value ="${displayDocument['MID']}">
-							</div>	
-						</div>	
-						
-						<div class = "form-group form-horizontal">
-							<label class="control-label col-sm-2" for = "lsl"> Weight LSL </label>  
-							<div class="col-sm-10">
-								<input class="form-control" type = "text" id="lsl" value ="${displayDocument['LSL']}">
-							</div>	
-						</div>					
-						
-						<div class = "form-group form-horizontal">
-							<label class="control-label col-sm-2" for = "density">Density </label>  
-							<div class="col-sm-10">
-								<input class="form-control" type = "text" id="density" value ="${displayDocument['density']}">
-							</div>	
-						</div>	
-												
-						<button class="btn btn-primary" id="next2">Next</button>
-					</div>
-
-			
-					<div id="block3" style="display : none">
-						<div class = "form-group form-horizontal">
-							<label class="control-label col-sm-3" for = "burr">Compaction control burr </label>  
-							<div class="col-sm-9">
-								<input class="form-control" type = "text" id="burr" value ="${displayDocument['burr']}">
-							</div>	
-						</div>
-						
-						<button class="btn btn-primary" id="next3">Next</button>
-					</div>			
-					
-					
-					<div id="block4" style="display : none">
 						<h4> Number of Bubbles found : <%=request.getAttribute("numberOfBubbles")%> </h4>
-						<button class="btn btn-primary" id="next4">Proceed</button>			
+						<button class="btn btn-primary" id="next2">Proceed</button>			
 					</div>	
 					
-					<div id="block5" style="display : none">
+					<div id="block3" style="display : none">
+						<div class = "form-group form-horizontal">
+							<label class="control-label col-sm-2">Bubble No:</label>  
+							<div class="col-sm-10">
+								<input class="form-control" type="text" id="bubbleNumber" value ="">
+							</div>	
+						</div>	 
 						<div class = "form-group form-horizontal">
 							<label class="control-label col-sm-2">Value</label>  
 							<div class="col-sm-10">

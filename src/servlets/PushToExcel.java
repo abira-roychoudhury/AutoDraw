@@ -1,6 +1,7 @@
 package servlets;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,6 +28,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONObject;
 
 
 /**
@@ -44,32 +46,31 @@ public class PushToExcel extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String partno = request.getParameter("partno");
 		String partname = request.getParameter("partname");
 		String processname = request.getParameter("processname");
-		String usl = request.getParameter("usl");
-		String mid = request.getParameter("mid");
-		String lsl = request.getParameter("lsl");
-		String density = request.getParameter("density");
-        String burr = request.getParameter("burr");
-        
+		String customerpartno = request.getParameter("customerpartno");
+		String releasedate = request.getParameter("releasedate");
+		        
         int numberOfBubbles = Integer.parseInt(request.getParameter("numberOfBubbles"));
-        //String bubbleValue = request.getParameter("bubbleValue");
+        String bubbleJsonString = request.getParameter("bubbleValueString");
+        System.out.println("bubbleValue "+bubbleJsonString);
+        
+        
+        System.out.println(partno+"  "+partname+"   ");
+        JSONObject bubbleValue = new JSONObject(bubbleJsonString);
+		/*try {
+			bubbleValue = (JSONObject)new JSONParser().parse(bubbleJsonString);
+		} catch (ParseException e) {
+			bubbleValue = new JSONObject();
+			e.printStackTrace();
+		}*/
+        
 		
-		System.out.println(usl + " value "+mid);
+	
 				
-		String excelFilePath = "C:/eclipse-jee-luna-R-win32-x86_64/eclipse/ExcelFiles/ControlDemo.xlsx"; //
+		String excelFilePath = "ExcelFiles/ControlDemo.xlsx"; //
         
         try {
             FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
@@ -78,44 +79,59 @@ public class PushToExcel extends HttpServlet {
             
             Cell cellPartNo= sheet.getRow(2).getCell(0);
             String partNo = cellPartNo.getStringCellValue();
-            System.out.println("partno text "+partNo);
             cellPartNo.setCellValue(partNo+" "+partno);
             
-           Cell cellPartName= sheet.getRow(3).getCell(0);
+            Cell cellPartName= sheet.getRow(3).getCell(0);
             String partName = cellPartName.getStringCellValue();
-            cellPartName.setCellValue(partName+" "+partname);
+            cellPartName.setCellValue(partName+" "+partname);          
+            
+            Cell cellCustomerPartNo= sheet.getRow(2).getCell(9);
+            String customerPartNo = cellCustomerPartNo.getStringCellValue();
+            cellCustomerPartNo.setCellValue(customerPartNo+" "+customerpartno);
+            
+            Cell cellReleaseDate = sheet.getRow(1).getCell(9);
+            String releaseDate = cellReleaseDate.getStringCellValue();
+            cellReleaseDate.setCellValue(releaseDate+" "+releasedate);
+            
             
             int lastRow = sheet.getLastRowNum();
             
-            Row compactionRow = sheet.createRow(++lastRow);
-            Cell cellProcessName= compactionRow.createCell(1);
-            cellProcessName.setCellValue(processname);   
-            
-            Cell cellWeightNo = compactionRow.createCell(3);
-            cellWeightNo.setCellValue("1");            
-            Cell cellWeight = compactionRow.createCell(4);
-            cellWeight.setCellValue("Weight");            
-            Cell cellWeightUsl = compactionRow.createCell(7);
-            cellWeightUsl.setCellValue("USL : "+usl);            
-            Cell cellWeightMid = sheet.createRow(++lastRow).createCell(7);
-            cellWeightMid.setCellValue("MID : "+mid);            
-            Cell cellWeightLsl = sheet.createRow(++lastRow).createCell(7);
-            cellWeightLsl.setCellValue("LSL : "+lsl);            
-            Cell cellDensity = sheet.createRow(++lastRow).createCell(4);
-            cellDensity.setCellValue("Density");          
-            Cell cellDensityValue = sheet.getRow(lastRow).createCell(7);
-            cellDensityValue.setCellValue(density);
-
-            
-            Cell cellBurrNo = sheet.createRow(++lastRow).createCell(3);
-            cellBurrNo.setCellValue("2");
-            Cell cellBurr = sheet.getRow(lastRow).createCell(4);
-            cellBurr.setCellValue("Compaction burr control");
-            Cell cellBurrValue = sheet.getRow(lastRow).createCell(7);
-            cellBurrValue.setCellValue(burr);
+            Row processRow = sheet.createRow(++lastRow);
+            Cell cellProcessName= processRow.createCell(1);
+            cellProcessName.setCellValue(processname);  
+            int count=0;
             
             
-            for(int i=0;i<numberOfBubbles;i++)
+            @SuppressWarnings("unchecked")
+            Iterator<String> bubbleIterator = bubbleValue.keys();
+            
+            while(bubbleIterator.hasNext()) {
+            	String number = bubbleIterator.next();
+            	String value = (String) bubbleValue.get(number);
+            	
+            	Row bubbleRow;
+            	if(count==0)
+            		{
+            			bubbleRow = processRow;
+            			count++;            		
+            		}
+            	else
+            		bubbleRow = sheet.createRow(++lastRow);
+            		
+            	Cell cellBubbleNo = bubbleRow.createCell(3);
+            	cellBubbleNo.setCellValue(number);
+            	
+            	Cell cellBubbleValue = bubbleRow.createCell(7);
+            	cellBubbleValue.setCellValue(value);
+            	
+            	Cell cellReactionPlan = bubbleRow.createCell(12);
+            	cellReactionPlan.setCellValue("Quarantine, Reset, follow QA/P05/WI01");
+            	
+            	
+            	System.out.println(number + "  "+ value);
+            }
+            
+           /* for(int i=0;i<numberOfBubbles;i++)
             {
             	int bubbleNo = 2;
             	String bubbleValue = request.getParameter("bubbleValue["+i+"]");
@@ -131,9 +147,8 @@ public class PushToExcel extends HttpServlet {
                      cellBubbleValue.setCellValue(bubbleValue);
             	}
             		
-            }
-            
-           
+            }*/
+                      
             
             inputStream.close();
             
@@ -142,7 +157,7 @@ public class PushToExcel extends HttpServlet {
             workbook.close();
             outputStream.close();
             
-        }catch (IOException | EncryptedDocumentException ex) {
+        }catch (IOException | EncryptedDocumentException ex) { 
             ex.printStackTrace();
         }		
 		

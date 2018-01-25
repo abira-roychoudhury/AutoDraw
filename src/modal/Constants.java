@@ -355,10 +355,20 @@ public class Constants {
 		public static final String TotalTaxAndInterestPayable__c = "TotalTaxAndInterestPayable__c";
 		public static final String TotalTaxAndInterestPayableOld__c = "TotalTaxAndInterestPayableOld__c";
 		public static final String TotalTaxesPaid__c = "TotalTaxesPaid__c";
-		public static final String TotalTaxesPaidOld__c = "TotalTaxesPaidOld__c";
-		
-		
+		public static final String TotalTaxesPaidOld__c = "TotalTaxesPaidOld__c";		
 			
 	}
+	
+	public static final String[] partName = {"PART","NAME","OIL","TYPE","CONTENT","HARDNESS","CASE","DEPTH","GEN","TOLERANCE","UNIT","HRB"};
+	public static final String[] customerPartNo = {"CUSTOMER","PART","MATERIAL","DENSITY","FINISH","WEIGHT","APPD","DRAWN","CHKD","DATE","INITIAL"};
+	
+
+	//Bubble Detection 
+	public static final int bubbleMarginX = 20;
+	public static final int bubbleMarginY = 100;
+	public static final int bubbleMarginWidth = 510;
+	public static final int bubbleMarginHeight = 100; 
+	
+	public static final double bubbleDetectionThreshold = 0.60;
 	
 }

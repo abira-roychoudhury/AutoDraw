@@ -1,6 +1,9 @@
 package apiClass;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+
+import modal.Constants;
 
 
 public class DocumentTemplating {
@@ -11,65 +14,81 @@ public class DocumentTemplating {
 		//String compactionVariation[] = {"Compacting","Compactian","Compaction","onpaction","ompaction"};
 		
 		String splitDesc[] = descriptionStr.split("\\n");
-		int partno=0, processname=0,burr=0,usl=0,mid=0,lsl=0,partname=0;
-		String key="",value="",density1="",density2="";
-		int colon,space;
+		int partno=0, processname=0,partname=0,customerPartNo=0,date=0;
+		String extract = "";
 		System.out.println("*******************************************************");
 		for(int i=0; i<splitDesc.length;i++)
 		{
 			System.out.println(splitDesc[i]);
 			//partno extraction
-			if(splitDesc[i].contains("porite") && partno==0){
-				displayDocument.put("Part No", splitDesc[i].substring(7));
+			if(splitDesc[i].contains("DRG") && partno==0){
+				try{
+					extract = splitDesc[i].substring(splitDesc[i].indexOf("DRG")+5).trim();
+				}catch (StringIndexOutOfBoundsException e) {
+					extract = splitDesc[++i].trim();
+				}
+				if(extract.length()<5)
+					extract = splitDesc[++i].trim();
+				displayDocument.put("Part No", extract);
 				partno++;
+			}
+					
+			if(splitDesc[i].contains("DRS")  && partno==0){
+				try{
+					extract = splitDesc[i].substring(splitDesc[i].indexOf("DRS")+5).trim();
+				}catch (StringIndexOutOfBoundsException e) {
+					extract = splitDesc[++i].trim();
+				}
+				if(extract.length()<5)
+					extract = splitDesc[++i].trim();
+				displayDocument.put("Part No", extract);
+				partno++;
+			}
+			if(splitDesc[i].contains("INA") && displayDocument.get("Part No").length()<5){
+				extract = splitDesc[i].trim();
+				displayDocument.put("Part No", extract);
+			}
+			
+			//revision date extraction
+			if(splitDesc[i].matches("\\d\\d.\\d\\d.\\d\\d\\d\\d")) {
+				displayDocument.put("Release Date", splitDesc[i]);
+				date++;
 			}
 			
 			//process name extraction
-			else if(splitDesc[i].contains("Process") && processname==0){
-				displayDocument.put("Process Name", splitDesc[i+3]);
+			else if(splitDesc[i].contains("PROCESS") && processname==0){
+				extract = splitDesc[++i];
+				if(splitDesc[++i].contains("INSPECTION"))
+					extract = extract + " " + "INSPECTION";
+				displayDocument.put("Process Name", extract);
 				processname++;				
 			}
 			
-			//compacting burr control extraction
-			else if(splitDesc[i].contains("control") && splitDesc[i].contains("") && burr==0){
-				key = "burr";
-				value = splitDesc[i].substring(splitDesc[i].indexOf(":")+1);
-				displayDocument.put(key,value);
-				burr++;				
-			}
-			
-			//USL extraction
-			else if(splitDesc[i].contains("USL") && usl==0){
-				colon = splitDesc[i].indexOf(":");
-				value = splitDesc[i].substring(colon+2,colon+6);
-				displayDocument.put("USL", value);
-				density1 = splitDesc[i+1];
-				usl++;
-			}
-			
-			//MID extraction
-			else if(splitDesc[i].contains("MID") && mid==0){
-				colon = splitDesc[i].indexOf(":");
-				value = splitDesc[i].substring(colon+2,colon+6);
-				displayDocument.put("MID", value);
-				mid++;
-			}
-			
-			//LSL extraction
-			else if(splitDesc[i].contains("LSL") && lsl==0){
-				colon = splitDesc[i].indexOf(":");
-				value = splitDesc[i].substring(colon+2,colon+6);
-				displayDocument.put("LSL", value);
-				density2 = splitDesc[i+1];;
-				displayDocument.put("density", density1+"~"+density2);
-				lsl++;
+			//Customer Part Number extraction
+			else if(splitDesc[i].contains("CUSTOMER") && customerPartNo==0){
+				while(Arrays.stream(Constants.customerPartNo).parallel().anyMatch(splitDesc[i]::contains)) {
+					i++;
+				}
+				int space = splitDesc[i].indexOf(" ");
+				if(space<0)
+					extract = splitDesc[i].trim();
+				else
+					extract = splitDesc[i].substring(0,space).trim();
+				displayDocument.put("Customer Part No", extract);
+				customerPartNo++;
 			}
 			
 			//Part name extraction
 			else if(splitDesc[i].contains("PART") && splitDesc[i].contains("NAME") && partname==0){
-				displayDocument.put("Part Name", splitDesc[i+1]);
+				while(Arrays.stream(Constants.partName).parallel().anyMatch(splitDesc[i]::contains)) {
+					i++;
+				}
+				extract = splitDesc[i].trim();
+				displayDocument.put("Part Name", extract);
 				partname++;
 			}
+			
+			
 				
 		}		
 		return displayDocument;

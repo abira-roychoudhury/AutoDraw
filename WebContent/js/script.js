@@ -5,6 +5,8 @@ $(function(){
 	var croppedImageBase64;
 	var bubbleValue = {};
 	var countOfBubble = 0;
+	var imgNoBubbles;
+	var imgWithBubbles;
 	
 	
 function draw(base64) {
@@ -20,26 +22,77 @@ function draw(base64) {
 	    	
 	    	canvas.height = imgObj.height;
 	    	canvas.width = imgObj.width;
-	    	console.log("executing height");
+	    	//console.log("executing height");
 
 	    	image.height = (image.width / imgObj.width) * imgObj.height;
+	    	
 	    	aspectRatioR = image.width/image.height;
 	    	aspectRatio = image.width / imgObj.width;
 	    	
-		  	console.log(image.height)
+		  	/*console.log(image.height)
 		  	console.log(image.width)
 		  	console.log(imgObj.height)
-		  	console.log(imgObj.width)
+		  	console.log(imgObj.width)*/
 		  	
 		  	ctx.drawImage(imgObj, 0, 0, imgObj.width, imgObj.height);
 		  
 		  	image.src = canvas.toDataURL();
 		  	
+		  	createImageWithoutBubbles();
 	   };
   	}
 }
 
+
 draw(img);
+
+function createImageWithoutBubbles(){
+	
+	console.log("inside createImageWithoutBubbles")
+	
+	var image = new Image();  
+	image.src = img;
+	
+	imgNoBubbles = new Image();
+	imgWithBubbles = new Image();
+	
+  	var canvas = document.createElement('canvas');
+  	
+	if (canvas.getContext) {
+		var ctx = canvas.getContext('2d');
+
+		image.onload = function() {
+			
+			imgWithBubbles.src = image.src;
+	  	
+	    	canvas.height = image.height;
+	    	canvas.width = image.width;
+	    	
+		    ctx.drawImage(image, 0, 0, image.width, image.height)
+		    ctx.fillStyle="white";
+		    
+			ctx.lineWidth = (image.width / 500 ) * 0.5;
+			
+			
+			for(var i=0; i<numberOfBubbles; i++){
+				
+				var coordinate = coordinatesOfBubbles[i];
+				console.log(coordinate);
+				var ox = coordinate.x1;
+				var oy = coordinate.y1;
+				var owidth = coordinate.x2 - coordinate.x1;
+				var oheight =  coordinate.y2 - coordinate.y1;
+		
+		   		ctx.fillRect(ox, oy, owidth,oheight);	
+		   		
+			}
+			imgNoBubbles.src = canvas.toDataURL();
+		
+	  	};
+		
+	}   
+   
+}
 
 
 function drawPolyies(base64){
@@ -61,10 +114,12 @@ function drawPolyies(base64){
 	    	canvas.height = img.height;
 	    	canvas.width = img.width;
 
-	    	owidth = (owidth - ox);
-			oheight = (oheight - oy);
+	    	/*owidth = (owidth - ox);
+			oheight = (oheight - oy);*/
 			
-	   		image.height = (image.width / img.width) * img.height;
+	    	var ratio = (image.width / img.width);
+	    	
+	   		image.height = ratio * img.height;
 	    	
 		    ctx.drawImage(img, 0, 0, img.width, img.height)
 		  	//ctx.strokeRect(ox, oy, owidth, oheight);
@@ -75,21 +130,21 @@ function drawPolyies(base64){
 			
 			for(var i=0; i<numberOfBubbles; i++){
 				
-				var coordinate = coordinatesOfBubbles[i];
+				var coordinate = coordinatesOfValues[i];
 				console.log(coordinate);
 				var ox = coordinate.x1;
 				var oy = coordinate.y1;
 				var owidth = coordinate.x2 - coordinate.x1;
 				var oheight =  coordinate.y2 - coordinate.y1;
-				
-				ox = ((img.width/compressedDim.width) * ox) - ((img.width / 500 ));
-				oy = ((img.width/compressedDim.width) * oy) - ((img.height / 500 ));
-				owidth = ((img.width/compressedDim.width) * owidth) + ((img.width / 500 ) * 20);
-				oheight = ((img.width/compressedDim.width) * oheight) + ((img.height / 500 ) * 5);
-				
+				/*
+				ox = ox * ratio;
+				oy = oy * ratio;
+				owidth = owidth * ratio;
+				oheight = oheight * ratio;
+				*/
 		   		ctx.strokeRect(ox, oy, owidth,oheight);	
 		   		
-		   		console.log("drawing :"+ ox +","+ oy+","+ owidth+","+oheight  )
+		   		console.log("drawing :"+ ox +","+ oy+","+ owidth+","+oheight )
 			}
 		  	image.src = canvas.toDataURL();
 		  	
@@ -117,16 +172,22 @@ function getSelection(image, selection) {
 	    	
         	var newHeight = height/aspectRatio;
         	var newWidth = width/aspectRatio;
+        	x1 = (x1/aspectRatio);
+        	y1 = (y1/aspectRatio);
         	
         	canvas.height = newHeight;
 	    	canvas.width = newWidth;
-        	
-	    	canvasContext.drawImage(image,(x1/aspectRatio) - 20,y1/aspectRatio,newWidth,newHeight,0,0,newWidth,newHeight);
 	    	
+	    	image.src = img;
+        	
+	    	canvasContext.drawImage(imgNoBubbles, x1, y1, newWidth, newHeight, 0, 0, newWidth, newHeight);
 	    	
 	    	var croppedImage = document.getElementById("croppedImage");
+	    	 
+	    	croppedImage.height = (croppedImage.width/ newWidth) * newHeight;
+	    	
 	    	croppedImage.src = canvas.toDataURL();
-	    	croppedImageBase64 = croppedImage.src;	    	
+	    	croppedImageBase64 = canvas.toDataURL();	    	
         	
         }       
     }
@@ -179,12 +240,16 @@ $("#excel").click
     	var partno = $('#partno').val();
     	var partname = $('#partname').val();
     	var processname = $('#processname').val(); 
-    	var usl = $('#usl').val();
-    	var mid = $('#mid').val();
-    	var lsl = $('#lsl').val();
-    	var density = $('#density').val();
-        var burr = $('#burr').val();
-        //var bubbleValue = $('#bubbleValue').val();
+    	var customerpartno = $('#customerpartno').val();
+    	var releasedate = $('#date').val();
+    	
+    	//sorting the bubble value with its key
+    	var sortedBubbleValue = {}
+    	Object.keys(bubbleValue).sort().forEach(function(key) {
+    		sortedBubbleValue[key] = bubbleValue[key];
+    		});
+    	var bubbleValueString = JSON.stringify(sortedBubbleValue);
+    	console.log(bubbleValueString);
     	
     	$('#excelLabel').text("");
     	$("#submitLoader").show();
@@ -195,8 +260,8 @@ $("#excel").click
         (
             {
                 url:'/AutoDraw/PushToExcel',
-                data: {"partno":partno, "partname":partname, "processname":processname, "usl":usl, "mid":mid, "lsl":lsl, "density":density, "burr":burr, "bubbleValue":bubbleValue,
-                	"numberOfBubbles":numberOfBubbles},
+                data: {"partno":partno, "partname":partname, "processname":processname, "customerpartno":customerpartno, "bubbleValueString":bubbleValueString,"numberOfBubbles":numberOfBubbles,
+                		"releasedate":releasedate},
                 type:'post',
                 success:function(data){
                 	console.log(data);
@@ -222,29 +287,20 @@ $("#excel").click
 $('#next1').click(function(){
 	$('#block1').hide();
 	$('#block2').show();
+	drawPolyies(img);
 });
 
 $('#next2').click(function(){
 	$('#block2').hide();
 	$('#block3').show();
-});
-
-$('#next3').click(function(){
-	$('#block3').hide();
-	$('#block4').show();	
-	drawPolyies(img);
-});
-
-$('#next4').click(function(){
-	$('#block4').hide();
-	$('#block5').show();
 	draw(img);
-	focusOnBubble(countOfBubble);
-	
+	focusOnBubble(countOfBubble);	
 });
+
 
 $('#skip').click(function(){
-	bubbleValue[countOfBubble] = "";
+	var presentBubbleNumber = $("#bubbleNumber").val();
+	bubbleValue[presentBubbleNumber] = "";
 	countOfBubble = countOfBubble + 1;
 	if(countOfBubble>=numberOfBubbles)
 		$('#bubbleLabel').text("No More bubbles could be detected. Please select any other bubble manually.");
@@ -253,57 +309,116 @@ $('#skip').click(function(){
 });
 
 $('#save').click(function(){
-	bubbleValue[countOfBubble] = $("#bubbleValue").val();
+	var presentBubbleNumber = $("#bubbleNumber").val();
+	bubbleValue[presentBubbleNumber] = $("#bubbleValue").val();
 	countOfBubble = countOfBubble + 1;
 	if(countOfBubble>=numberOfBubbles)
 		{
 			$('#bubbleLabel').text("No More bubbles could be detected. Please select any other bubble manually.");
-			console.log("bubble value "+bubbleValue[0]+" "+bubbleValue[1]+" "+bubbleValue[2]+" "+bubbleValue[3]+" "+bubbleValue[4]
-			+" "+bubbleValue[5]+" "+bubbleValue[6]);
+			console.log("bubble value ");
+			console.log(bubbleValue)
 		}
 	else
 		focusOnBubble(countOfBubble);	
 });
 
+
+
+
 function focusOnBubble(index){
 	console.log("inside focus function")
-	var coordinate = coordinatesOfBubbles[index];
-	var ox1 = coordinate.x1*aspectRatio - 75*aspectRatio;
-	var oy1 = coordinate.y1*aspectRatio - 25*aspectRatio;
-	var ox2 = coordinate.x2*aspectRatio + 75*aspectRatio;
-	var oy2 = coordinate.y2*aspectRatio + 25*aspectRatio;
+	var coordinate = coordinatesOfValues[index];
+	var ox1 = coordinate.x1*aspectRatio;
+	var oy1 = coordinate.y1*aspectRatio;
+	var ox2 = coordinate.x2*aspectRatio;
+	var oy2 = coordinate.y2*aspectRatio;
+	
 	console.log()
 	$('#image').imgAreaSelect({ x1: ox1, y1: oy1, x2: ox2, y2: oy2,
 		handles: true,
 		});
-	var width = ox2 - ox1;
-	var height = oy2 - oy1;
-	        	
+	
+	var width = ox1 - ox2;
+	var height = oy1 - oy2;
+
+	var orignalox1 = coordinate.x1;
+	var orignaloy1 = coordinate.y1;
+	var originalWidth = coordinate.x2 - coordinate.x1;
+	var originalHeight = coordinate.y2 - coordinate.y1;
+
 	var canvas = document.createElement('canvas');
 	var canvasContext = canvas.getContext('2d'); 
-	var visionCanvas = document.createElement('canvas');
-	var visionCanavasContext = visionCanvas.getContext('2d');
 	
-	var newHeight = height/aspectRatio;
-	var newWidth = width/aspectRatio;
+	canvas.height = originalHeight;
+	canvas.width = originalWidth;
 	
-	canvas.height = newHeight;
-	canvas.width = newWidth;
-	visionCanvas.height = height+25/aspectRatio;
-	visionCanvas.width = width+150/aspectRatio;
+	canvasContext.drawImage(imgWithBubbles, orignalox1, orignaloy1, originalWidth, originalHeight, 0, 0, originalWidth, originalHeight);
 	
-	var image = document.getElementById("image"); 
-	canvasContext.drawImage(image,ox1/aspectRatio,oy1/aspectRatio,newWidth,newHeight,0,0,newWidth,newHeight);
-	visionCanavasContext.drawImage(image,ox1/aspectRatio,oy1/aspectRatio,visionCanvas.width,visionCanvas.height,0,0,visionCanvas.width,visionCanvas.height);
-	
-	
-	var croppedImage = document.getElementById("croppedImage");
+	var croppedImage = document.getElementById("croppedImage");	 
+	croppedImage.height = (croppedImage.width/ originalWidth) * originalHeight;	
 	croppedImage.src = canvas.toDataURL();
-	croppedImageBase64 = visionCanvas.toDataURL();	
-	console.log("inside looping ##############################################");
-	console.log(croppedImageBase64);
 	
-	$("#submit").trigger("click")
+	console.log("inside looping ##############################################");
+
+	var canvasValues = document.createElement('canvas');
+	var canvasValuesContext = canvasValues.getContext('2d'); 
+	
+	canvasValues.height = originalHeight;
+	canvasValues.width = originalWidth;
+
+	canvasValuesContext.drawImage(imgNoBubbles, orignalox1, orignaloy1, originalWidth, originalHeight, 0, 0, originalWidth, originalHeight);
+	
+	croppedImageBase64 = canvasValues.toDataURL();	
+	
+	console.log("inside looping ##############################################");
+	
+	var coordinateBubble = coordinatesOfBubbles[index];
+	var orignalBubblex1 = coordinateBubble.x1;
+	var orignalBubbley1 = coordinateBubble.y1;
+	var originalBubbleWidth = coordinateBubble.x2 - coordinateBubble.x1;
+	var originalBubbleHeight = coordinateBubble.y2 - coordinateBubble.y1;
+	
+	var canvasBubble = document.createElement('canvas');
+	var canvasBubbleContext = canvasBubble.getContext('2d'); 
+	
+	canvasBubble.height = originalBubbleHeight;
+	canvasBubble.width = originalBubbleWidth;
+	
+		
+	canvasBubbleContext.drawImage(imgWithBubbles, orignalBubblex1, orignalBubbley1, originalBubbleWidth, originalBubbleHeight, 0, 0, originalBubbleWidth, originalBubbleHeight);
+	croppedBubbleBase64 = canvasBubble.toDataURL();
+	//console.log(croppedBubbleBase64);
+	
+	
+	$('#bubbleValue').val("");
+	$('#bubbleNumber').val("");
+	$("#submitLoader").show();
+  	$('input, button, textarea').attr("disabled", true);
+	$(".container").addClass('haze');
+	$.ajax
+    (
+        {
+            url:'/AutoDraw/BubbleDataOCR',
+            data: {"croppedImageBase64":croppedImageBase64, "croppedBubbleBase64":croppedBubbleBase64},
+            type:'post',
+            success:function(data){
+            	console.log(data)
+            	data = JSON.parse(data);
+            	$('#bubbleValue').val(data.bubbleValue); 
+            	$('#bubbleNumber').val(data.bubbleNumber);
+            	$("#submitLoader").hide();
+            	$('input, button, textarea').attr("disabled", false);
+            	$('.container').removeClass('haze');
+            },
+            error:function(err){
+            	console.log(err)
+            	$("#submitLoader").hide();
+            	$('input, button, textarea').attr("disabled", false);
+            	$('.container').removeClass('haze');
+            	
+            }
+        }
+    );
 }
 
 });

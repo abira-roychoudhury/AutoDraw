@@ -82,9 +82,11 @@ public class Processing extends HttpServlet {
 				{
 					fileName = fileItem.getName();					 
 					start = new Date();
-					fileItem.write(pdfFile);      //writing a temporary pdf file
-					fileItem.delete();
-					PdfToImage.convert(pdfFile, imgFile);
+					/*fileItem.write(pdfFile);      //writing a temporary pdf file
+					PdfToImage.convert(pdfFile, imgFile);*/
+					
+					fileItem.write(imgFile);
+					fileItem.delete();					
 					filePath = imgFile.getAbsolutePath();
 					end = new Date();			          
 				}
@@ -113,11 +115,12 @@ public class Processing extends HttpServlet {
 		request.setAttribute(Constants.base64conversion, timeDifference);
 		
 		//Get Location of bubble using template matching
-		JSONObject bubbleData = TemplateMatching.getBubbleLocation(filePath);
+		JSONObject bubbleData = TemplateMatching.getBubbleLocation(filePath,Constants.bubbleDetectionThreshold);
 		int numberOfBubbles = bubbleData.getInt("numberOfBubbles");
 		System.out.println("numberOfBubbles : "+numberOfBubbles);
 		request.setAttribute("numberOfBubbles", numberOfBubbles);		
 		request.setAttribute("coordinatesOfBubbles",bubbleData.get("coordinatesOfBubbles"));
+		request.setAttribute("coordinatesOfValues", bubbleData.get("coordinatesOfValues"));
 
 		
 		//compressed image property 

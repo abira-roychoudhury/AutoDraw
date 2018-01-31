@@ -81,7 +81,7 @@ public class BubbleDataOCR extends HttpServlet {
 				extract = extract + " "+splitDesc[index];
 			}
 		}
-		return extract;
+		return extract.trim();
 	}
 	
 	

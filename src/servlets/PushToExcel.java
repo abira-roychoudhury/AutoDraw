@@ -93,6 +93,14 @@ public class PushToExcel extends HttpServlet {
             String releaseDate = cellReleaseDate.getStringCellValue();
             cellReleaseDate.setCellValue(releaseDate+" "+releasedate);
             
+            Cell cellRevDate = sheet.getRow(1).getCell(11);
+            String revDate = cellRevDate.getStringCellValue();
+            cellRevDate.setCellValue(revDate+" "+releasedate);
+            
+            Cell cellRevNo = sheet.getRow(1).getCell(12);
+            String revNo = cellRevNo.getStringCellValue();
+            cellRevNo.setCellValue(revNo+" 00");
+                        
             
             int lastRow = sheet.getLastRowNum();
             
@@ -100,6 +108,12 @@ public class PushToExcel extends HttpServlet {
             Cell cellProcessName= processRow.createCell(1);
             cellProcessName.setCellValue(processname);  
             int count=0;
+            
+            if(processname.equals("COMPACTION"))
+            {
+            	Cell cellProcessDescription= processRow.createCell(2);
+            	cellProcessDescription.setCellValue("Compacting \nPress: "+request.getParameter("Press"));  
+            }
             
             
             @SuppressWarnings("unchecked")
@@ -121,8 +135,36 @@ public class PushToExcel extends HttpServlet {
             	Cell cellBubbleNo = bubbleRow.createCell(3);
             	cellBubbleNo.setCellValue(number);
             	
-            	Cell cellBubbleValue = bubbleRow.createCell(7);
-            	cellBubbleValue.setCellValue(value);
+            	if(value.contains("USL")) {
+            		Cell cellBubbleProduct = bubbleRow.createCell(4);
+            		cellBubbleProduct.setCellValue("Weight \nUSL MID LSL");
+            		
+            		Cell cellBubbleValue = bubbleRow.createCell(7);
+                	cellBubbleValue.setCellValue(value.substring(value.indexOf("LSL ")+4));
+            	}
+            	else if(value.contains(":")) {
+            		Cell cellBubbleProduct = bubbleRow.createCell(4);
+            		cellBubbleProduct.setCellValue(value.substring(0,value.indexOf(":")));
+            		
+            		Cell cellBubbleValue = bubbleRow.createCell(7);
+                	cellBubbleValue.setCellValue(value.substring(value.indexOf(":")+1));
+            	}
+            	else {
+            		Cell cellBubbleProduct = bubbleRow.createCell(4);
+            		cellBubbleProduct.setCellValue("Length/ Width");
+            		            		
+            		Cell cellBubbleValue = bubbleRow.createCell(7);
+            		cellBubbleValue.setCellValue(value);
+            	}
+            	
+            	Cell cellSize = bubbleRow.createCell(9);
+            	cellSize.setCellValue("5pc");
+            	
+            	Cell cellFreq = bubbleRow.createCell(10);
+            	cellFreq.setCellValue("First off");
+            	
+            	Cell cellControlMethod = bubbleRow.createCell(11);
+            	cellControlMethod.setCellValue("First off approval");
             	
             	Cell cellReactionPlan = bubbleRow.createCell(12);
             	cellReactionPlan.setCellValue("Quarantine, Reset, follow QA/P05/WI01");

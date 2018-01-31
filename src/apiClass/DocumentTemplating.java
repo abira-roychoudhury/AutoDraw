@@ -14,7 +14,7 @@ public class DocumentTemplating {
 		//String compactionVariation[] = {"Compacting","Compactian","Compaction","onpaction","ompaction"};
 		
 		String splitDesc[] = descriptionStr.split("\\n");
-		int partno=0, processname=0,partname=0,customerPartNo=0,date=0;
+		int partno=0, processname=0,partname=0,customerPartNo=0,date=0,mixno=0,press=0;
 		String extract = "";
 		System.out.println("*******************************************************");
 		for(int i=0; i<splitDesc.length;i++)
@@ -50,7 +50,7 @@ public class DocumentTemplating {
 			}
 			
 			//revision date extraction
-			if(splitDesc[i].matches("\\d\\d.\\d\\d.\\d\\d\\d\\d")) {
+			if(splitDesc[i].matches("\\d\\d.\\d\\d.\\d\\d\\d\\d") && date==0) {
 				displayDocument.put("Release Date", splitDesc[i]);
 				date++;
 			}
@@ -88,7 +88,19 @@ public class DocumentTemplating {
 				partname++;
 			}
 			
+			//Mix number extraction
+			else if(splitDesc[i].contains("MIX") && splitDesc[++i].contains("NUMBER") && mixno==0){
+				extract = splitDesc[++i].trim();
+				displayDocument.put("Mix Number", extract);
+				mixno++;
+			}
 			
+			//Mix number extraction
+			else if(splitDesc[i].contains("PRESS") && press==0){
+				extract = splitDesc[++i].trim();
+				displayDocument.put("Press", extract);
+				press++;
+			}
 				
 		}		
 		return displayDocument;
